@@ -1,6 +1,8 @@
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:camera/camera.dart';
+import 'package:face_net_authentication/pages/sign-in.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
 
 class CameraService {
@@ -33,7 +35,7 @@ class CameraService {
   }) async {
     this._cameraController = CameraController(
       description,
-      ResolutionPreset.high,
+      ResolutionPreset.low,
       enableAudio: false,
     );
     await _cameraController?.initialize();
@@ -52,13 +54,19 @@ class CameraService {
     }
   }
 
-  Future<XFile?> takePicture() async {
+  Future<File> takePicture() async {
+
     assert(_cameraController != null, 'Camera controller not initialized');
     await _cameraController?.stopImageStream();
     XFile? file = await _cameraController?.takePicture();
     _imagePath = file?.path;
-    return file;
+
+
+
+    return File(file!.path) ;
+    // return file;
   }
+
 
   Size getImageSize() {
     assert(_cameraController != null, 'Camera controller not initialized');

@@ -1,21 +1,30 @@
+import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:camera/camera.dart';
 import 'package:face_net_authentication/locator.dart';
 import 'package:face_net_authentication/pages/db/databse_helper.dart';
 import 'package:face_net_authentication/pages/models/user.model.dart';
 import 'package:face_net_authentication/pages/profile.dart';
+import 'package:face_net_authentication/pages/sign-in.dart';
+import 'package:face_net_authentication/pages/sign-up.dart';
 import 'package:face_net_authentication/pages/widgets/app_button.dart';
 import 'package:face_net_authentication/services/camera.service.dart';
 import 'package:face_net_authentication/services/ml_service.dart';
+import 'package:path/path.dart' as Path;
 import 'package:flutter/material.dart';
 import 'package:image/image.dart';
+import 'package:sqflite/sqflite.dart';
 import '../home.dart';
 import 'app_text_field.dart';
-
+//signup
 class AuthActionButton extends StatefulWidget {
   AuthActionButton(
       {Key? key,
-      required this.onPressed,
-      required this.isLogin,
-      required this.reload});
+        required this.onPressed,
+        required this.isLogin,
+        required this.reload});
   final Function onPressed;
   final bool isLogin;
   final Function reload;
@@ -24,13 +33,14 @@ class AuthActionButton extends StatefulWidget {
 }
 
 class _AuthActionButtonState extends State<AuthActionButton> {
+
   final MLService _mlService = locator<MLService>();
   final CameraService _cameraService = locator<CameraService>();
 
   final TextEditingController _userTextEditingController =
-      TextEditingController(text: '');
+  TextEditingController(text: '');
   final TextEditingController _passwordTextEditingController =
-      TextEditingController(text: '');
+  TextEditingController(text: '');
 
   User? predictedUser;
 
@@ -46,8 +56,17 @@ class _AuthActionButtonState extends State<AuthActionButton> {
     );
     await _databaseHelper.insert(userToSave);
     this._mlService.setPredictedData([]);
+    //adding anoher database
+    // dynamic cvd =convertIntoBase64(predictedData).toString();
+    // insertRegistered(user, password , cvd);
+
+   var a= SignUpState.pathCapture;
+   var b= base64Image(a!);
+    SignUpState.insertRegistered(user,password,b);
+
+
     Navigator.push(context,
-        MaterialPageRoute(builder: (BuildContext context) => MyHomePage()));
+        MaterialPageRoute(builder: (BuildContext context) => SignIn()));
   }
 
   Future _signIn(context) async {
@@ -57,9 +76,9 @@ class _AuthActionButtonState extends State<AuthActionButton> {
           context,
           MaterialPageRoute(
               builder: (BuildContext context) => Profile(
-                    this.predictedUser!.user,
-                    imagePath: _cameraService.imagePath!,
-                  )));
+                this.predictedUser!.user,
+                imagePath: _cameraService.imagePath!,
+              )));
     } else {
       showDialog(
         context: context,
@@ -88,8 +107,8 @@ class _AuthActionButtonState extends State<AuthActionButton> {
           }
         }
         PersistentBottomSheetController bottomSheetController =
-            Scaffold.of(context)
-                .showBottomSheet((context) => signSheet(context));
+        Scaffold.of(context)
+            .showBottomSheet((context) => signSheet(context));
         bottomSheetController.closed.whenComplete(() => widget.reload());
       }
     } catch (e) {
@@ -143,61 +162,62 @@ class _AuthActionButtonState extends State<AuthActionButton> {
         children: [
           widget.isLogin && predictedUser != null
               ? Container(
-                  child: Text(
-                    'Welcome back, ' + predictedUser!.user + '.',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                )
+            child: Text(
+              'Welcome back, ' + predictedUser!.user + '.',
+              style: TextStyle(fontSize: 20),
+            ),
+          )
               : widget.isLogin
-                  ? Container(
-                      child: Text(
-                      'User not found 😞',
-                      style: TextStyle(fontSize: 20),
-                    ))
-                  : Container(),
+              ? Container(
+              child: Text(
+                'User not found 😞',
+                style: TextStyle(fontSize: 20),
+              ))
+              : Container(),
           Container(
             child: Column(
               children: [
                 !widget.isLogin
                     ? AppTextField(
-                        controller: _userTextEditingController,
-                        labelText: "Your Name",
-                      )
+                  controller: _userTextEditingController,
+                  labelText: "Your Name",
+                )
                     : Container(),
                 SizedBox(height: 10),
                 widget.isLogin && predictedUser == null
                     ? Container()
                     : AppTextField(
-                        controller: _passwordTextEditingController,
-                        labelText: "Password",
-                        isPassword: true,
-                      ),
+                  keyboardType: TextInputType.number,
+                  controller: _passwordTextEditingController,
+                  labelText: "ID",
+                  isPassword: true,
+                ),
                 SizedBox(height: 10),
                 Divider(),
                 SizedBox(height: 10),
                 widget.isLogin && predictedUser != null
                     ? AppButton(
-                        text: 'LOGIN',
-                        onPressed: () async {
-                          _signIn(context);
-                        },
-                        icon: Icon(
-                          Icons.login,
-                          color: Colors.white,
-                        ),
-                      )
+                  text: 'LOGIN',
+                  onPressed: () async {
+                    _signIn(context);
+                  },
+                  icon: Icon(
+                    Icons.login,
+                    color: Colors.white,
+                  ),
+                )
                     : !widget.isLogin
-                        ? AppButton(
-                            text: 'SIGN UP',
-                            onPressed: () async {
-                              await _signUp(context);
-                            },
-                            icon: Icon(
-                              Icons.person_add,
-                              color: Colors.white,
-                            ),
-                          )
-                        : Container(),
+                    ? AppButton(
+                  text: 'SIGN UP',
+                  onPressed: () async {
+                    await _signUp(context);
+                  },
+                  icon: Icon(
+                    Icons.person_add,
+                    color: Colors.white,
+                  ),
+                )
+                    : Container(),
               ],
             ),
           ),
@@ -210,4 +230,35 @@ class _AuthActionButtonState extends State<AuthActionButton> {
   void dispose() {
     super.dispose();
   }
+
+void initState(){
+    super.initState();
+
+}
+
+  String base64Image(String imagePath) {
+    File imageFile = File(imagePath);
+    List<int> imageBytes = imageFile.readAsBytesSync();
+    return base64Encode(imageBytes);
+  }
+// List To Base 64 conversion
+//   String convertIntoBase64(List<dynamic> imageBytes) {
+//     String base64File = base64Encode(imageBytes.cast<int>() );
+//     return base64File;
+//   }
+
+  // String base64Image(XFile file) {
+  //   List<int> imageBytes = file.readAsBytesSync();
+  //   return base64Encode(imageBytes);
+  // }
+
+
+
+
+  // String convertIntoBase64(List<dynamic> imageBytes) {
+  //   Uint8List bytes = Uint8List.fromList(imageBytes.cast<int>());
+  //   String base64File = base64Encode(bytes);
+  //
+  //   return base64File;
+  // }
 }

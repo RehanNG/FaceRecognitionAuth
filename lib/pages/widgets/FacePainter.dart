@@ -10,19 +10,29 @@ class FacePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     if (face == null) return;
 
+
+    // Draw black background
+    // canvas.drawRect(
+    //   Rect.fromLTWH(0, 0, size.width, size.height),
+    //   Paint()..color = Colors.black,
+    // );
+    // Draw black background ends here
+
     Paint paint;
 
-    if (this.face!.headEulerAngleY! > 10 || this.face!.headEulerAngleY! < -10) {
+    // if (this.face!.headEulerAngleY! > 10 || this.face!.headEulerAngleY! < -10) {
+    //   paint = Paint()
+    //     ..style = PaintingStyle.stroke
+    //     ..strokeWidth = 1.0
+    //     ..color = Colors.red;
+    //
+    //
+    // } else {
       paint = Paint()
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 3.0
-        ..color = Colors.red;
-    } else {
-      paint = Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 3.0
+        ..strokeWidth = 1.0
         ..color = Colors.green;
-    }
+    // }
 
     scaleX = size.width / imageSize.width;
     scaleY = size.height / imageSize.height;
@@ -54,5 +64,7 @@ RRect _scaleRect(
       rect.top.toDouble() * scaleY,
       widgetSize.width - rect.right.toDouble() * scaleX,
       rect.bottom.toDouble() * scaleY,
-      Radius.circular(10));
+      Radius.circular(5),
+
+  );
 }

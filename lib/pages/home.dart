@@ -48,31 +48,35 @@ class _MyHomePageState extends State<MyHomePage> {
         elevation: 0,
         backgroundColor: Colors.transparent,
         actions: <Widget>[
-          Padding(
-            padding: EdgeInsets.only(right: 20, top: 20),
-            child: PopupMenuButton<String>(
-              child: Icon(
-                Icons.more_vert,
-                color: Colors.black,
-              ),
-              onSelected: (value) {
-                switch (value) {
-                  case 'Clear DB':
-                    DatabaseHelper _dataBaseHelper = DatabaseHelper.instance;
-                    _dataBaseHelper.deleteAll();
-                    break;
-                }
-              },
-              itemBuilder: (BuildContext context) {
-                return {'Clear DB'}.map((String choice) {
-                  return PopupMenuItem<String>(
-                    value: choice,
-                    child: Text(choice),
-                  );
-                }).toList();
-              },
-            ),
-          ),
+          // Padding(
+          //   padding: EdgeInsets.only(right: 20, top: 20),
+          //
+          //   child: PopupMenuButton<String>(
+          //     child: Icon(
+          //       Icons.more_vert,
+          //       color: Colors.black,
+          //     ),
+          //     onSelected: (value) {
+          //       switch (value) {
+          //         case 'Clear DB':
+          //           DatabaseHelper _dataBaseHelper = DatabaseHelper.instance;
+          //           _dataBaseHelper.deleteAll();
+          //           break;
+          //       }
+          //     },
+          //     itemBuilder: (BuildContext context) {
+          //       return {'Clear DB'}.map((String choice) {
+          //         return PopupMenuItem<String>(
+          //           value: choice,
+          //           child: Text(choice),
+          //         );
+          //       }).toList();
+          //     },
+          //   ),
+          //
+          // ),
+
+
         ],
       ),
       body: !loading
@@ -88,7 +92,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         child: Column(
                           children: [
                             Text(
-                              "FACE RECOGNITION AUTHENTICATION",
+                              "NEDO FACE ATTENDANCE",
                               style: TextStyle(
                                   fontSize: 25, fontWeight: FontWeight.bold),
                               textAlign: TextAlign.center,
@@ -97,7 +101,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               height: 20,
                             ),
                             Text(
-                              "Demo application that uses Flutter and tensorflow to implement authentication with facial recognition",
+                              " We Provide The Time Attendance & Payroll Softwares with Latest Technologies and Capabilities.",
                               style: TextStyle(
                                 fontSize: 16,
                               ),
@@ -198,42 +202,42 @@ class _MyHomePageState extends State<MyHomePage> {
                               thickness: 2,
                             ),
                           ),
-                          InkWell(
-                            onTap: _launchURL,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: Colors.black,
-                                boxShadow: <BoxShadow>[
-                                  BoxShadow(
-                                    color: Colors.blue.withOpacity(0.1),
-                                    blurRadius: 1,
-                                    offset: Offset(0, 2),
-                                  ),
-                                ],
-                              ),
-                              alignment: Alignment.center,
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 14, horizontal: 16),
-                              width: MediaQuery.of(context).size.width * 0.8,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    'CONTRIBUTE',
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-                                  FaIcon(
-                                    FontAwesomeIcons.github,
-                                    color: Colors.white,
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
+                          // InkWell(
+                          //   onTap: _launchURL,
+                          //   child: Container(
+                          //     decoration: BoxDecoration(
+                          //       borderRadius: BorderRadius.circular(10),
+                          //       color: Colors.black,
+                          //       boxShadow: <BoxShadow>[
+                          //         BoxShadow(
+                          //           color: Colors.blue.withOpacity(0.1),
+                          //           blurRadius: 1,
+                          //           offset: Offset(0, 2),
+                          //         ),
+                          //       ],
+                          //     ),
+                          //     alignment: Alignment.center,
+                          //     padding: EdgeInsets.symmetric(
+                          //         vertical: 14, horizontal: 16),
+                          //     width: MediaQuery.of(context).size.width * 0.8,
+                          //     child: Row(
+                          //       mainAxisAlignment: MainAxisAlignment.center,
+                          //       children: [
+                          //         Text(
+                          //           'CONTRIBUTE',
+                          //           style: TextStyle(color: Colors.white),
+                          //         ),
+                          //         SizedBox(
+                          //           width: 10,
+                          //         ),
+                          //         FaIcon(
+                          //           FontAwesomeIcons.github,
+                          //           color: Colors.white,
+                          //         )
+                          //       ],
+                          //     ),
+                          //   ),
+                          // ),
                         ],
                       )
                     ],

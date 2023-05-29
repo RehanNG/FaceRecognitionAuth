@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class AuthButton extends StatelessWidget {
   const AuthButton({Key? key, required this.onTap}) : super(key: key);
   final void Function() onTap;
-
+  //login/signin
   @override
   Widget build(BuildContext context) {
     return InkWell(

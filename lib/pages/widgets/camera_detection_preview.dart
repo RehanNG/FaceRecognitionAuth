@@ -36,8 +36,12 @@ class CameraDetectionPreview extends StatelessWidget {
                       painter: FacePainter(
                         face: _faceDetectorService.faces[0],
                         imageSize: _cameraService.getImageSize(),
+
                       ),
-                    )
+
+                    ),
+
+
                 ],
               ),
             ),

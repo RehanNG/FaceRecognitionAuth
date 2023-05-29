@@ -1,0 +1,7 @@
+Executable : C:\Users\Developer\AppData\Local\Android\sdk\cmake\3.18.1\bin\ninja.exe
+arguments : 
+-C
+F:\RehanUsmani\FaceRecognitionAuth\android\app\.cxx\RelWithDebInfo\73e1w2c5\x86
+convertImage
+jvmArgs : 
+

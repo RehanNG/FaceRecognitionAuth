@@ -1,0 +1,3 @@
+F:/RehanUsmani/FaceRecognitionAuth/android/app/.cxx/RelWithDebInfo/73e1w2c5/x86/CMakeFiles/rebuild_cache.dir
+F:/RehanUsmani/FaceRecognitionAuth/android/app/.cxx/RelWithDebInfo/73e1w2c5/x86/CMakeFiles/convertImage.dir
+F:/RehanUsmani/FaceRecognitionAuth/android/app/.cxx/RelWithDebInfo/73e1w2c5/x86/CMakeFiles/edit_cache.dir

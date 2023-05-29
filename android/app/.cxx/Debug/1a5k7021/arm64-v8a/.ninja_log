@@ -1,0 +1,6 @@
+# ninja log v5
+1	1057	706613089	CMakeFiles/convertImage.dir/F_/RehanUsmani/FaceRecognitionAuth/ios/Classes/converter.c.o	5f6e51d0652b3ac0
+1058	1185	706613089	F:/RehanUsmani/FaceRecognitionAuth/build/app/intermediates/cxx/Debug/1a5k7021/obj/arm64-v8a/libconvertImage.so	fb93868600366e5
+13	692	706703328	F:/RehanUsmani/FaceRecognitionAuth/build/app/intermediates/cxx/Debug/1a5k7021/obj/arm64-v8a/libconvertImage.so	fb93868600366e5
+13	545	706710740	F:/RehanUsmani/FaceRecognitionAuth/build/app/intermediates/cxx/Debug/1a5k7021/obj/arm64-v8a/libconvertImage.so	fb93868600366e5
+4	458	706721424	F:/RehanUsmani/FaceRecognitionAuth/build/app/intermediates/cxx/Debug/1a5k7021/obj/arm64-v8a/libconvertImage.so	fb93868600366e5

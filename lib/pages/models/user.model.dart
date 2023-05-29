@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 class User {
-  String user;
+  String user; //this is user name
   String password;
   List modelData;
 

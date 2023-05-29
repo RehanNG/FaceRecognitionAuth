@@ -1,0 +1,2 @@
+ninja: Entering directory `F:\RehanUsmani\FaceRecognitionAuth\android\app\.cxx\RelWithDebInfo\73e1w2c5\arm64-v8a'
+ninja: no work to do.
