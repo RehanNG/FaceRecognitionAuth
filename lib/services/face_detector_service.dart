@@ -18,11 +18,11 @@ class FaceDetectorService {
   void initialize() {
     _faceDetector = GoogleMlKit.vision.faceDetector(
       FaceDetectorOptions(
-        performanceMode: FaceDetectorMode.accurate,
+        performanceMode: FaceDetectorMode.fast,
         // enableContours: true,
-           enableLandmarks: true,
-          minFaceSize:1.0,
-        enableClassification:true,
+        //    enableLandmarks: true,
+          // minFaceSize:1.0,
+        // enableClassification:true,
       ),
     );
 
@@ -127,10 +127,11 @@ class FaceDetectorService {
   Future<List<Face>> detect(CameraImage image, InputImageRotation rotation) {
     final faceDetector = GoogleMlKit.vision.faceDetector(
       FaceDetectorOptions(
-        performanceMode: FaceDetectorMode.accurate,
+        // performanceMode: FaceDetectorMode.accurate,
+        performanceMode: FaceDetectorMode.fast,
         enableLandmarks: true,
-        minFaceSize:1.0,
-          enableClassification:true,
+        minFaceSize:0.8,
+          // enableClassification:true,
       ),
     );
     final WriteBuffer allBytes = WriteBuffer();

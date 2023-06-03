@@ -18,9 +18,12 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
+import 'package:intl/intl.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart' as Path;
-class SignIn extends StatefulWidget {
+
+import '../services/c_conversion.dart';
+class SignIn extends  StatefulWidget {
   const SignIn({Key? key}) : super(key: key);
 
   @override
@@ -40,18 +43,20 @@ class SignInState extends State<SignIn> {
 
   var date = DateTime.now();
   Future<Database>? _database;
+  final ConversionService _conversionService = ConversionService();
   @override
   void initState() {
     super.initState();
 
     _start();
-    _database=initializeDatabase();
 
+    _database=initializeDatabase();
+    _conversionService.initialize();
   }
 
   @override
   void dispose() {
-    _cameraService.dispose();
+    // _cameraService.dispose();
     _mlService.dispose();
     _faceDetectorService.dispose();
     super.dispose();
@@ -68,73 +73,188 @@ class SignInState extends State<SignIn> {
   Size? imageSize;
   bool _detectingFaces = false;
   Face? faceDetected;
+
+
+  //orignal
+  // _frameFaces() async {
+  //   imageSize = _cameraService.getImageSize();
+  //   bool _detectingFaces = false;
+  //   _cameraService.cameraController!
+  //       .startImageStream((CameraImage image) async {
+  //
+  //         if(_cameraService.cameraController !=null)
+  //           {
+  //             if(_detectingFaces) return;
+  //             _detectingFaces=true;
+  //             try{
+  //               // var clearFace=image;
+  //               await _faceDetectorService.detectFacesFromImage(image);
+  //
+  //               if(_faceDetectorService.faces.isNotEmpty){
+  //                 setState(() {
+  //                   faceDetected= _faceDetectorService.faces[0];
+  //                 });
+  //                 var eulerAngleY = faceDetected!.headEulerAngleY! >10 || faceDetected!.headEulerAngleY! <-10;
+  //                 if(!eulerAngleY){
+  //                   await _predictFacesFromImage(image: image);
+  //                   Navigator.push(
+  //                     context,
+  //                     MaterialPageRoute(builder: (context) => SignIn()),
+  //                   );
+  //                 }
+  //               }
+  //
+  //               else{
+  //                 setState(() {
+  //                   _faceDetectorService.initialize();
+  //                   faceDetected=null;
+  //                   Navigator.push(
+  //                     context,
+  //                     MaterialPageRoute(builder: (context) => SignIn()),
+  //                   );
+  //                 });
+  //                 _detectingFaces=false;
+  //                 Navigator.push(
+  //                   context,
+  //                   MaterialPageRoute(builder: (context) => SignIn()),
+  //                 );
+  //               }
+  //
+  //             }catch(e){
+  //               _faceDetectorService.initialize();
+  //               _detectingFaces = false;
+  //               Navigator.push(
+  //                 context,
+  //                 MaterialPageRoute(builder: (context) => SignIn()),
+  //               );
+  //             }
+  //           }
+  //
+  //     // if (processing) return; // prevents unnecessary overprocessing.
+  //     // processing = true;
+  //     //here marking attendance functionality is done
+  //     // await _predictFacesFromImage(image: image);
+  //     // processing = true;
+  //   });
+  //
+  //
+  // }
+
+
+
+  // _frameFaces() async {
+  //   imageSize = _cameraService.getImageSize();
+  //   _cameraService.cameraController!.startImageStream((CameraImage image) async {
+  //     if (_cameraService.cameraController != null) {
+  //       if (_detectingFaces) return;
+  //       _detectingFaces = true;
+  //       try {
+  //         await _faceDetectorService.detectFacesFromImage(image);
+  //
+  //         if (_faceDetectorService.faces.isNotEmpty) {
+  //           setState(() {
+  //             faceDetected = _faceDetectorService.faces[0];
+  //           });
+  //           var eulerAngleY =
+  //               faceDetected!.headEulerAngleY! > 10 || faceDetected!.headEulerAngleY! < -10;
+  //           if (!eulerAngleY) {
+  //             await _predictFacesFromImage(image: image);
+  //             Navigator.push(
+  //               context,
+  //               MaterialPageRoute(builder: (context) => SignIn()),
+  //             );
+  //           }
+  //         } else {
+  //           setState(() {
+  //             _faceDetectorService.initialize();
+  //             faceDetected = null;
+  //           });
+  //         }
+  //       } catch (e) {
+  //         _faceDetectorService.initialize();
+  //       } finally {
+  //         _detectingFaces = false;
+  //       }
+  //     }
+  //   });
+  // }
+
+  //this version removes
   _frameFaces() async {
+    _cameraService.cameraController!.setFlashMode(FlashMode.torch);
     imageSize = _cameraService.getImageSize();
-    bool _detectingFaces = false;
-    _cameraService.cameraController!
-        .startImageStream((CameraImage image) async {
+    if (_cameraService.cameraController != null && !_cameraService.cameraController!.value.isStreamingImages) {
+      _cameraService.cameraController!.startImageStream((CameraImage image) async {
+        if (_detectingFaces) return;
+        _detectingFaces = true;
+        try {
+          await _faceDetectorService.detectFacesFromImage(image);
 
-          if(_cameraService.cameraController !=null)
-            {
-              if(_detectingFaces) return;
-              _detectingFaces=true;
-              try{
-                // var clearFace=image;
-                await _faceDetectorService.detectFacesFromImage(image);
-
-                if(_faceDetectorService.faces.isNotEmpty){
-                  setState(() {
-                    faceDetected= _faceDetectorService.faces[0];
-                  });
-                  var eulerAngleY = faceDetected!.headEulerAngleY! >10 || faceDetected!.headEulerAngleY! <-10;
-                  if(!eulerAngleY){
-                    await _predictFacesFromImage(image: image);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => SignIn()),
-                    );
-                  }
-                }
-
-                else{
-                  setState(() {
-                    _faceDetectorService.initialize();
-                    faceDetected=null;
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => SignIn()),
-                    );
-                  });
-                  _detectingFaces=false;
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => SignIn()),
-                  );
-                }
-
-              }catch(e){
-                _faceDetectorService.initialize();
-                _detectingFaces = false;
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => SignIn()),
-                );
-              }
+          if (_faceDetectorService.faces.isNotEmpty) {
+            faceDetected = _faceDetectorService.faces[0];
+            var eulerAngleY =
+                faceDetected!.headEulerAngleY! > 10 || faceDetected!.headEulerAngleY! < -10;
+            if (!eulerAngleY) {
+              await _predictFacesFromImage(image: image);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SignIn()),
+              );
             }
-
-      // if (processing) return; // prevents unnecessary overprocessing.
-      // processing = true;
-      //here marking attendance functionality is done
-      // await _predictFacesFromImage(image: image);
-      // processing = true;
-    });
-
-
+          } else {
+            _faceDetectorService.initialize();
+            faceDetected = null;
+          }
+        } finally {
+          _detectingFaces = false;
+        }
+        setState(() {});
+      });
+    }
   }
+  // _frameFaces() async {
+  //   imageSize = _cameraService.getImageSize();
+  //   if (_cameraService.cameraController != null) {
+  //     _cameraService.cameraController!.startImageStream((CameraImage image) async {
+  //       if (_detectingFaces) return;
+  //       _detectingFaces = true;
+  //       try {
+  //         await _faceDetectorService.detectFacesFromImage(image);
+  //
+  //         if (_faceDetectorService.faces.isNotEmpty) {
+  //           faceDetected = _faceDetectorService.faces[0];
+  //           var eulerAngleY =
+  //               faceDetected!.headEulerAngleY! > 10 || faceDetected!.headEulerAngleY! < -10;
+  //           if (!eulerAngleY) {
+  //             await _predictFacesFromImage(image: image);
+  //             Navigator.push(
+  //               context,
+  //               MaterialPageRoute(builder: (context) => SignIn()),
+  //             );
+  //           }
+  //         } else {
+  //           _faceDetectorService.initialize();
+  //           faceDetected = null;
+  //         }
+  //       } finally {
+  //         _detectingFaces = false;
+  //       }
+  //       setState(() {});
+  //     });
+  //   }
+  // }
+
 bool locked=false;
+
+
+
   Future<void> _predictFacesFromImage({@required CameraImage? image}) async {
 
+    DateTime now = DateTime.now();
+    String formattedDate = DateFormat('yyyy-MM-dd').format(now.toLocal());
+
 if(!locked){
+
   locked=true;
     var getUser;
     var getId;
@@ -162,11 +282,8 @@ if(!locked){
           getId = user.password;
           // var getId = user.password;
           print(getId);
-        }
 
-        //  capture image as base 64
         var cameraService = _cameraService.imagePath.toString();
-        // var imagetoSend= convertCameraImageToBase64(image);
         var imagetoSend = base64Image(cameraService);
         print(imagetoSend);
         //attendance stats
@@ -179,13 +296,27 @@ if(!locked){
         Fluttertoast.showToast(
             msg: " user: $getUser --- Id: $getId --- present : $present_status ",
             backgroundColor: Colors.green,
-            gravity: ToastGravity.CENTER);
+            gravity: ToastGravity.CENTER,
+        toastLength:Toast.LENGTH_SHORT,
+        ) ;
         _faceDetectorService.initialize();
         //
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(builder: (context) => SignIn()),
-        // );
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => SignIn()),
+        );
+
+        }
+        else if( user != null &&  (date.minute==date.minute) ){
+          Fluttertoast.showToast(
+            msg: " duplicate punch ",
+            backgroundColor: Colors.red,
+            gravity: ToastGravity.CENTER,
+            toastLength:Toast.LENGTH_SHORT,
+          );
+        }
+
+
       } catch (e) {
         print("catch kia hua exception   $e");
       }
@@ -196,7 +327,16 @@ if(!locked){
 
       //else  main jane sa pehla error da reha ha yane if ke condition main phat reha ha
 
-    } else {
+    }
+
+    else if(!_faceDetectorService.faceDetected){
+      showDialog(
+          context: context,
+          builder: (context) =>
+              AlertDialog(content: Text('No face detected!')));
+    }
+
+    else {
       _faceDetectorService.initialize();
       print("present in else");
       showDialog(
@@ -332,15 +472,21 @@ if(!locked){
     Widget? fab;
     if (!_isPictureTaken) fab = AuthButton(onTap: onTap);
 
-    return Scaffold(
-      key: scaffoldKey,
-      body: Stack(
-        children: [body, header],
+    return WillPopScope(
+      onWillPop: () async {return false;} ,
+      child: Scaffold(
+        key: scaffoldKey,
+        body: Stack(
+          children: [body, header],
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        floatingActionButton: fab,
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: fab,
     );
   }
+
+
+
 
   signInSheet({@required User? user}) => user == null
       ? Container(
@@ -352,4 +498,8 @@ if(!locked){
     ),
   )
       : SignInSheet(user: user);
+
+  //for back
+
+
 }

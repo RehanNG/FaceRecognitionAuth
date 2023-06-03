@@ -33,7 +33,7 @@ class CameraDetectionPreview extends StatelessWidget {
                   CameraPreview(_cameraService.cameraController!),
                   if (_faceDetectorService.faceDetected)
                     CustomPaint(
-                      painter: FacePainter(
+                      painter:   FacePainter(
                         face: _faceDetectorService.faces[0],
                         imageSize: _cameraService.getImageSize(),
 

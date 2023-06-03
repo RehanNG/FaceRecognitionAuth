@@ -11,7 +11,7 @@ class AuthButton extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
-          color: Color(0xFF0F0BDB),
+          color: Color(0xF0BDB),
           boxShadow: <BoxShadow>[
             BoxShadow(
               color: Colors.blue.withOpacity(0.1),
@@ -28,13 +28,13 @@ class AuthButton extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'CAPTURE',
+              'MENU',
               style: TextStyle(color: Colors.white),
             ),
             SizedBox(
               width: 10,
             ),
-            Icon(Icons.camera_alt, color: Colors.white)
+            Icon(Icons.settings, color: Colors.white)
           ],
         ),
       ),

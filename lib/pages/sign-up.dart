@@ -86,7 +86,7 @@ static Future<void> insertRegistered(String username, String userId, String imag
 
   @override
   void dispose() {
-    _cameraService.dispose();
+    // _cameraService.dispose();
     super.dispose();
   }
 

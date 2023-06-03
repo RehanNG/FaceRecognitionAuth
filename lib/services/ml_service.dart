@@ -9,6 +9,8 @@ import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:image/image.dart' as imglib;
 
+import 'c_conversion.dart';
+
 class MLService {
   Interpreter? _interpreter;
   // double threshold = 0.5;
@@ -18,21 +20,18 @@ class MLService {
   // double threshold = 0.75;
   List _predictedData = [];
   List get predictedData => _predictedData;
+  final ConversionService _conversionService = ConversionService();
   Future initialize() async {
     late Delegate delegate;
     try {
       if (Platform.isAndroid) {
         delegate = GpuDelegateV2(
-          options: GpuDelegateOptionsV2(
+          options: GpuDelegateOptionsV2 (
             isPrecisionLossAllowed: false,
             inferencePreference: TfLiteGpuInferenceUsage.fastSingleAnswer,
-            // inferencePreference: TfLiteGpuInferenceUsage.preferenceSustainSpeed,
-            // inferencePriority1: TfLiteGpuInferencePriority.minLatency,
-            // inferencePriority1: TfLiteGpuInferencePriority.minLatency,
-            inferencePriority1: TfLiteGpuInferencePriority.maxPrecision,
+            inferencePriority1: TfLiteGpuInferencePriority.minMemoryUsage,
             inferencePriority2: TfLiteGpuInferencePriority.auto,
-            // inferencePriority2: TfLiteGpuInferencePriority.maxPrecision,
-            // inferencePriority3: TfLiteGpuInferencePriority.auto,
+            inferencePriority3: TfLiteGpuInferencePriority.auto,
           ),
         );
       } else if (Platform.isIOS) {
@@ -63,12 +62,12 @@ class MLService {
     this._predictedData = List.from(output);
   }
 
-  Future<User?> predict() async {
+  Future<User?> predict() /*async*/ {
     return _searchResult(this._predictedData);
   }
 
   //work with this modify this
-  List/*new aded3 <double>*/<double> _preProcess(CameraImage image, Face faceDetected) {
+   List/*new aded3 <double>*/<double> _preProcess (CameraImage image, Face faceDetected) {
     imglib.Image croppedImage = _cropFace(image, faceDetected);
     imglib.Image img = imglib.copyResizeCropSquare(croppedImage, 112);
     //orgnal1
@@ -77,6 +76,8 @@ class MLService {
 
     //new added2
     Uint8List imageAsList = imageToByteListUint8(img);
+    print("Imageaslist ka variable   $imageAsList");
+
     return imageAsList.map((e) => (e - 127.5) / 128).toList();
   }
   //new added1
