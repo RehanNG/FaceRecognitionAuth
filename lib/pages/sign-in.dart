@@ -23,6 +23,9 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart' as Path;
 
 import '../services/c_conversion.dart';
+import '../services/timedelay_service.dart';
+import 'time_screen.dart';
+import 'dart:async';
 class SignIn extends  StatefulWidget {
   const SignIn({Key? key}) : super(key: key);
 
@@ -31,7 +34,7 @@ class SignIn extends  StatefulWidget {
 }
 
 class SignInState extends State<SignIn> {
-  CameraService _cameraService = locator<CameraService>();
+  static CameraService cameraService = locator<CameraService>();
   FaceDetectorService _faceDetectorService = locator<FaceDetectorService>();
   MLService _mlService = locator<MLService>();
 
@@ -47,11 +50,11 @@ class SignInState extends State<SignIn> {
   @override
   void initState() {
     super.initState();
-
     _start();
 
     _database=initializeDatabase();
     _conversionService.initialize();
+
   }
 
   @override
@@ -64,7 +67,7 @@ class SignInState extends State<SignIn> {
 
   Future _start() async {
     setState(() => _isInitializing = true);
-    await _cameraService.initialize();
+    await cameraService.initialize();
     _faceDetectorService.initialize();
     setState(() => _isInitializing = false);
     _frameFaces();
@@ -75,136 +78,58 @@ class SignInState extends State<SignIn> {
   Face? faceDetected;
 
 
-  //orignal
-  // _frameFaces() async {
-  //   imageSize = _cameraService.getImageSize();
-  //   bool _detectingFaces = false;
-  //   _cameraService.cameraController!
-  //       .startImageStream((CameraImage image) async {
-  //
-  //         if(_cameraService.cameraController !=null)
-  //           {
-  //             if(_detectingFaces) return;
-  //             _detectingFaces=true;
-  //             try{
-  //               // var clearFace=image;
-  //               await _faceDetectorService.detectFacesFromImage(image);
-  //
-  //               if(_faceDetectorService.faces.isNotEmpty){
-  //                 setState(() {
-  //                   faceDetected= _faceDetectorService.faces[0];
-  //                 });
-  //                 var eulerAngleY = faceDetected!.headEulerAngleY! >10 || faceDetected!.headEulerAngleY! <-10;
-  //                 if(!eulerAngleY){
-  //                   await _predictFacesFromImage(image: image);
-  //                   Navigator.push(
-  //                     context,
-  //                     MaterialPageRoute(builder: (context) => SignIn()),
-  //                   );
-  //                 }
-  //               }
-  //
-  //               else{
-  //                 setState(() {
-  //                   _faceDetectorService.initialize();
-  //                   faceDetected=null;
-  //                   Navigator.push(
-  //                     context,
-  //                     MaterialPageRoute(builder: (context) => SignIn()),
-  //                   );
-  //                 });
-  //                 _detectingFaces=false;
-  //                 Navigator.push(
-  //                   context,
-  //                   MaterialPageRoute(builder: (context) => SignIn()),
-  //                 );
-  //               }
-  //
-  //             }catch(e){
-  //               _faceDetectorService.initialize();
-  //               _detectingFaces = false;
-  //               Navigator.push(
-  //                 context,
-  //                 MaterialPageRoute(builder: (context) => SignIn()),
-  //               );
-  //             }
-  //           }
-  //
-  //     // if (processing) return; // prevents unnecessary overprocessing.
-  //     // processing = true;
-  //     //here marking attendance functionality is done
-  //     // await _predictFacesFromImage(image: image);
-  //     // processing = true;
-  //   });
-  //
-  //
-  // }
-
-
-
-  // _frameFaces() async {
-  //   imageSize = _cameraService.getImageSize();
-  //   _cameraService.cameraController!.startImageStream((CameraImage image) async {
-  //     if (_cameraService.cameraController != null) {
-  //       if (_detectingFaces) return;
-  //       _detectingFaces = true;
-  //       try {
-  //         await _faceDetectorService.detectFacesFromImage(image);
-  //
-  //         if (_faceDetectorService.faces.isNotEmpty) {
-  //           setState(() {
-  //             faceDetected = _faceDetectorService.faces[0];
-  //           });
-  //           var eulerAngleY =
-  //               faceDetected!.headEulerAngleY! > 10 || faceDetected!.headEulerAngleY! < -10;
-  //           if (!eulerAngleY) {
-  //             await _predictFacesFromImage(image: image);
-  //             Navigator.push(
-  //               context,
-  //               MaterialPageRoute(builder: (context) => SignIn()),
-  //             );
-  //           }
-  //         } else {
-  //           setState(() {
-  //             _faceDetectorService.initialize();
-  //             faceDetected = null;
-  //           });
-  //         }
-  //       } catch (e) {
-  //         _faceDetectorService.initialize();
-  //       } finally {
-  //         _detectingFaces = false;
-  //       }
-  //     }
-  //   });
-  // }
-
   //this version removes
   _frameFaces() async {
-    _cameraService.cameraController!.setFlashMode(FlashMode.torch);
-    imageSize = _cameraService.getImageSize();
-    if (_cameraService.cameraController != null && !_cameraService.cameraController!.value.isStreamingImages) {
-      _cameraService.cameraController!.startImageStream((CameraImage image) async {
+    // _cameraService.cameraController!.setFlashMode(FlashMode.torch);
+    imageSize = cameraService.getImageSize();
+    if (cameraService.cameraController != null && !cameraService.cameraController!.value.isStreamingImages) {
+
+      cameraService.cameraController!.startImageStream((CameraImage image) async {
         if (_detectingFaces) return;
         _detectingFaces = true;
         try {
           await _faceDetectorService.detectFacesFromImage(image);
 
           if (_faceDetectorService.faces.isNotEmpty) {
+            // cameraService.cameraController!.resumePreview();
             faceDetected = _faceDetectorService.faces[0];
             var eulerAngleY =
                 faceDetected!.headEulerAngleY! > 10 || faceDetected!.headEulerAngleY! < -10;
             if (!eulerAngleY) {
               await _predictFacesFromImage(image: image);
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => SignIn()),
-              );
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(builder: (context) => SignIn()),
+              // );
+              delayTimerForPageNavigation(4 ,context,SignIn());
             }
-          } else {
-            _faceDetectorService.initialize();
-            faceDetected = null;
           }
+          else {
+            //ager face detect na ho to date and time wale screen a gye
+
+
+            // Timer(Duration(seconds: 5), () {
+            //   _cameraService.cameraController!.stopImageStream();
+            // });
+              cameraService.cameraController!.pausePreview();
+
+            delayTimerForPageNavigation(10 ,context,timeScreen());
+            // _faceDetectorService.initialize();
+            // faceDetected = null;
+            // _detectingFaces = false;
+
+
+
+
+            // Future.delayed(Duration(seconds: 10), () {
+            //
+            //   _cameraService.cameraController!.stopImageStream();
+            // });
+
+
+
+          }
+
         } finally {
           _detectingFaces = false;
         }
@@ -212,38 +137,6 @@ class SignInState extends State<SignIn> {
       });
     }
   }
-  // _frameFaces() async {
-  //   imageSize = _cameraService.getImageSize();
-  //   if (_cameraService.cameraController != null) {
-  //     _cameraService.cameraController!.startImageStream((CameraImage image) async {
-  //       if (_detectingFaces) return;
-  //       _detectingFaces = true;
-  //       try {
-  //         await _faceDetectorService.detectFacesFromImage(image);
-  //
-  //         if (_faceDetectorService.faces.isNotEmpty) {
-  //           faceDetected = _faceDetectorService.faces[0];
-  //           var eulerAngleY =
-  //               faceDetected!.headEulerAngleY! > 10 || faceDetected!.headEulerAngleY! < -10;
-  //           if (!eulerAngleY) {
-  //             await _predictFacesFromImage(image: image);
-  //             Navigator.push(
-  //               context,
-  //               MaterialPageRoute(builder: (context) => SignIn()),
-  //             );
-  //           }
-  //         } else {
-  //           _faceDetectorService.initialize();
-  //           faceDetected = null;
-  //         }
-  //       } finally {
-  //         _detectingFaces = false;
-  //       }
-  //       setState(() {});
-  //     });
-  //   }
-  // }
-
 bool locked=false;
 
 
@@ -270,7 +163,7 @@ if(!locked){
         _mlService.setCurrentPrediction(image, _faceDetectorService.faces[0]);
         //  start from here
         //  capture face
-        await _cameraService.takePicture();
+        await cameraService.takePicture();
         setState(() => _isPictureTaken = true);
         //  capture user
         User? user = await _mlService.predict();
@@ -283,15 +176,16 @@ if(!locked){
           // var getId = user.password;
           print(getId);
 
-        var cameraService = _cameraService.imagePath.toString();
-        var imagetoSend = base64Image(cameraService);
+        var cameraServiceVar = cameraService.imagePath.toString();
+        var imagetoSend = base64Image(cameraServiceVar);
         print(imagetoSend);
         //attendance stats
         present_status = true;
         String pre_stat_conv = present_status.toString();
         //  mark attendance
+        //  inserting dummy data so that it dont give error after completion remove dymmy data
         insertRegistered(
-            getUser, getId, imagetoSend, pre_stat_conv, date.toString());
+            getUser, getId, imagetoSend, pre_stat_conv, date.toString() ,"monday","checkin");
         //show toast
         Fluttertoast.showToast(
             msg: " user: $getUser --- Id: $getId --- present : $present_status ",
@@ -328,21 +222,9 @@ if(!locked){
       //else  main jane sa pehla error da reha ha yane if ke condition main phat reha ha
 
     }
-
-    else if(!_faceDetectorService.faceDetected){
-      showDialog(
-          context: context,
-          builder: (context) =>
-              AlertDialog(content: Text('No face detected!')));
-    }
-
     else {
       _faceDetectorService.initialize();
       print("present in else");
-      showDialog(
-          context: context,
-          builder: (context) =>
-              AlertDialog(content: Text('No face detected!')));
     }
     if (!mounted) {
       return;
@@ -378,7 +260,9 @@ if(!locked){
     userId TEXT,
     image TEXT,
     presentstat TEXT,
-    attendancetime TEXT
+    attendancetime TEXT,
+    day TEXT,
+    attendanceType TEXT,
     )
     ''');
   }
@@ -393,8 +277,9 @@ if(!locked){
         }
     );
   }
-
-  Future<void> insertRegistered(String username , String userId,String image , String presentstat , String attendancetime)
+  // day TEXT,
+      // attendanceType TEXT,
+  Future<void> insertRegistered(String username , String userId,String image , String presentstat , String attendancetime  , String day , String attendanceType)
   async{
     final db= await _database;
 
@@ -405,6 +290,8 @@ if(!locked){
       'image':image,
       'presentstat':presentstat,
       'attendancetime':attendancetime,
+      'day':day,
+      'attendanceType':attendanceType,
     });
   }
 
@@ -418,7 +305,7 @@ if(!locked){
 
   Future<void> takePicture() async {
     if (_faceDetectorService.faceDetected) {
-      await _cameraService.takePicture();
+      await cameraService.takePicture();
       setState(() => _isPictureTaken = true);
     } else {
       showDialog(
@@ -461,7 +348,7 @@ if(!locked){
   Widget getBodyWidget() {
     if (_isInitializing) return Center(child: CircularProgressIndicator());
     if (_isPictureTaken)
-      return SinglePicture(imagePath: _cameraService.imagePath!);
+      return SinglePicture(imagePath: cameraService.imagePath!);
     return CameraDetectionPreview();
   }
 

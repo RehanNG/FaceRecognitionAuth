@@ -25,12 +25,15 @@ dependencies:
     sdk: flutter
 
 
+
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.4
   tflite_flutter: ^0.9.0
-  camera: ^0.9.4+19
+#  camera: ^0.9.4+19
+  camera: ^0.10.5+2
   path_provider: ^2.0.9
+  flutter_custom_cards: ^0.2.0
   path: ^1.8.0
   google_ml_kit: ^0.13.0
   image: ^3.0.2
@@ -42,6 +45,10 @@ dependencies:
   exif: ^3.1.2
   get_it: ^7.2.0
   get: ^4.6.5
+  intl: ^0.17.0
+  animated_bottom_navigation: ^0.0.4
+  flutter_localization: ^0.1.11
+  persistent_bottom_nav_bar: ^5.0.2
 
 
 
@@ -64,6 +71,7 @@ flutter:
   assets:
     - assets/mobilefacenet.tflite
     - assets/logo.png
+    - assets/particles.jpg
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
