@@ -23,6 +23,9 @@ class _UserMgtScreenState extends State<UserMgtScreen> {
                   context,
                   MaterialPageRoute(builder: (context) => const SignUp()),
                 );
+                // SignUpState.cameraService.cameraController!.resumePreview();
+
+
               }, icon:Icon(Icons.person_add)),
               Text("New user"),
             ],

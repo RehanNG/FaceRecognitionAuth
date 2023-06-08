@@ -13,14 +13,17 @@ import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart' as Path;
-class SignUp extends StatefulWidget {
+
+import '../services/timedelay_service.dart';
+import 'menus_screen.dart';
+class SignUp extends StatefulWidget  {
   const SignUp({Key? key}) : super(key: key);
 
   @override
   SignUpState createState() => SignUpState();
 }
 
-class SignUpState extends State<SignUp> {
+class SignUpState extends State<SignUp> with WidgetsBindingObserver{
 
  static String? imagePath; //Image path for base64 conversion
   Face? faceDetected;
@@ -39,11 +42,12 @@ class SignUpState extends State<SignUp> {
 
   // service injection
   FaceDetectorService _faceDetectorService = locator<FaceDetectorService>();
-  CameraService _cameraService = locator<CameraService>();
+  static CameraService cameraService = locator<CameraService>();
   MLService _mlService = locator<MLService>();
 
   @override
   void initState() {
+    WidgetsBinding.instance.addObserver(this );
     super.initState();
     _start();
     _database=initializeDatabase();
@@ -86,13 +90,63 @@ static Future<void> insertRegistered(String username, String userId, String imag
 
   @override
   void dispose() {
-    // _cameraService.dispose();
     super.dispose();
+    // cameraService.dispose();
+
   }
+ @override
+ void didChangeAppLifecycleState(AppLifecycleState state) {
+//start from here https://www.youtube.com/watch?v=a0RG0sxfSjk
+
+ /*
+ _start() async {
+    setState(() => _initializing = true);
+    await cameraService.initialize();
+    setState(() => _initializing = false);
+
+    _frameFaces();
+  }
+ * */
+
+
+   if(state == AppLifecycleState.resumed)
+   {
+     print("resumed");
+     _detectingFaces=true;
+     pictureTaken=true;
+     _initializing=true;
+     _saving=true;
+      cameraService.initialize();
+      _frameFaces();
+   }
+   else if(state==AppLifecycleState.inactive){
+     print("inactive");
+     _detectingFaces=false;
+     pictureTaken=false;
+     _initializing=false;
+     _saving=false;
+     // cameraService.cameraController!.stopImageStream();
+   }
+   else if(state == AppLifecycleState.detached){
+     print("Detached");
+   }
+   else if(state == AppLifecycleState.paused){
+     print("Paused");
+     _detectingFaces=false;
+     pictureTaken=false;
+     _initializing=false;
+     _saving=false;
+     // cameraService.cameraController!.stopImageStream();
+   }
+
+
+
+ }
+
 
   _start() async {
     setState(() => _initializing = true);
-    await _cameraService.initialize();
+    await cameraService.initialize();
     setState(() => _initializing = false);
 
     _frameFaces();
@@ -116,7 +170,7 @@ static Future<void> insertRegistered(String username, String userId, String imag
       await Future.delayed(Duration(milliseconds: 500));
       // await _cameraService.cameraController?.stopImageStream();
       await Future.delayed(Duration(milliseconds: 200));
-      File file = await _cameraService.takePicture();
+      File file = await cameraService.takePicture();
       //this is my image path that needed to be converted to base64
       imagePath = file?.path;
       //using in insertRegistered
@@ -132,10 +186,12 @@ static Future<void> insertRegistered(String username, String userId, String imag
   }
 
   _frameFaces() {
-    imageSize = _cameraService.getImageSize();
+    imageSize = cameraService.getImageSize();
 
-    _cameraService.cameraController?.startImageStream((image) async {
-      if (_cameraService.cameraController != null) {
+    cameraService.cameraController?.startImageStream((image) async {
+
+
+      if (cameraService.cameraController != null) {
         if (_detectingFaces) return;
 
         _detectingFaces = true;
@@ -144,6 +200,7 @@ static Future<void> insertRegistered(String username, String userId, String imag
           await _faceDetectorService.detectFacesFromImage(image);
 
           if (_faceDetectorService.faces.isNotEmpty) {
+
             setState(() {
               //front face
               faceDetected = _faceDetectorService.faces[0];
@@ -154,12 +211,24 @@ static Future<void> insertRegistered(String username, String userId, String imag
                 _saving = false;
               });
             }
-          } else {
+
+
+          }
+          // else if(cameraService.cameraController !=null && cameraService.cameraController!.value.isPreviewPaused){cameraService.cameraController!.resumePreview();   delayTimerForPageNavigation(0,context,SignUp());}
+
+          else {
             print('face is null');
             setState(() {
               faceDetected = null;
             });
+
+            // delayTimerForPageNavigation(3,context,MenuItems());
+
+
+
+
           }
+
 
           _detectingFaces = false;
         } catch (e) {
@@ -221,11 +290,11 @@ static Future<void> insertRegistered(String username, String userId, String imag
               child: Container(
                 width: width,
                 height:
-                    width * _cameraService.cameraController!.value.aspectRatio,
+                    width * cameraService.cameraController!.value.aspectRatio,
                 child: Stack(
                   fit: StackFit.expand,
                   children: <Widget>[
-                    CameraPreview(_cameraService.cameraController!),
+                    CameraPreview(cameraService.cameraController!),
                     CustomPaint(
                       painter: FacePainter(
                           face: faceDetected, imageSize: imageSize!),
@@ -259,4 +328,6 @@ static Future<void> insertRegistered(String username, String userId, String imag
               )
             : Container());
   }
+
+
 }

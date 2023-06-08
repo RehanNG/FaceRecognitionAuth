@@ -49,6 +49,7 @@ dependencies:
   animated_bottom_navigation: ^0.0.4
   flutter_localization: ^0.1.11
   persistent_bottom_nav_bar: ^5.0.2
+  shared_preferences: ^2.1.2
 
 
 

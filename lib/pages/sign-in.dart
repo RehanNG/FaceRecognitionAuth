@@ -19,6 +19,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart' as Path;
 
@@ -26,6 +27,8 @@ import '../services/c_conversion.dart';
 import '../services/timedelay_service.dart';
 import 'time_screen.dart';
 import 'dart:async';
+
+import 'time_screen.dart';
 class SignIn extends  StatefulWidget {
   const SignIn({Key? key}) : super(key: key);
 
@@ -97,23 +100,30 @@ class SignInState extends State<SignIn> {
                 faceDetected!.headEulerAngleY! > 10 || faceDetected!.headEulerAngleY! < -10;
             if (!eulerAngleY) {
               await _predictFacesFromImage(image: image);
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(builder: (context) => SignIn()),
-              // );
-              delayTimerForPageNavigation(4 ,context,SignIn());
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => timeScreen()),
+              );
+              // delayTimerForPageNavigation(4 ,context,SignIn());
+
+
             }
           }
           else {
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(builder: (context) => timeScreen()),
+            // );
+
             //ager face detect na ho to date and time wale screen a gye
 
 
             // Timer(Duration(seconds: 5), () {
             //   _cameraService.cameraController!.stopImageStream();
             // });
-              cameraService.cameraController!.pausePreview();
+            //   cameraService.cameraController!.pausePreview();
 
-            delayTimerForPageNavigation(10 ,context,timeScreen());
+
             // _faceDetectorService.initialize();
             // faceDetected = null;
             // _detectingFaces = false;
@@ -184,8 +194,12 @@ if(!locked){
         String pre_stat_conv = present_status.toString();
         //  mark attendance
         //  inserting dummy data so that it dont give error after completion remove dymmy data
-        insertRegistered(
-            getUser, getId, imagetoSend, pre_stat_conv, date.toString() ,"monday","checkin");
+          final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+          String? Checkin_gettingSharePrefs=prefs.getString("checkinaction");
+        String currentMonthDay =  timeScreenState.CurrentMonth_DAY;
+          insertRegistered(
+            getUser, getId, imagetoSend, pre_stat_conv, date.toString() ,"$currentMonthDay","$Checkin_gettingSharePrefs");
         //show toast
         Fluttertoast.showToast(
             msg: " user: $getUser --- Id: $getId --- present : $present_status ",
@@ -195,10 +209,13 @@ if(!locked){
         ) ;
         _faceDetectorService.initialize();
         //
+
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => SignIn()),
+          MaterialPageRoute(builder: (context) => timeScreen()),
+
         );
+
 
         }
         else if( user != null &&  (date.minute==date.minute) ){
@@ -262,7 +279,7 @@ if(!locked){
     presentstat TEXT,
     attendancetime TEXT,
     day TEXT,
-    attendanceType TEXT,
+    attendancetype TEXT
     )
     ''');
   }
@@ -291,7 +308,7 @@ if(!locked){
       'presentstat':presentstat,
       'attendancetime':attendancetime,
       'day':day,
-      'attendanceType':attendanceType,
+      'attendancetype':attendanceType,
     });
   }
 

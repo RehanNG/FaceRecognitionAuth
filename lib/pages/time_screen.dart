@@ -4,6 +4,7 @@ import 'package:face_net_authentication/pages/sign-up.dart';
 import 'package:flutter/material.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:intl/intl.dart' as DatePackage;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../locator.dart';
 import '../particle_canvas.dart';
@@ -45,15 +46,15 @@ class timeScreen extends StatefulWidget {
   const timeScreen({Key? key}) : super(key: key);
 
   @override
-  State<timeScreen> createState() => _timeScreenState();
+  State<timeScreen> createState() => timeScreenState();
 }
 
-class _timeScreenState extends State<timeScreen> {
+class timeScreenState extends State<timeScreen> {
 
 
   // String formattedDate = DateFormat.yMMMEd().format(DateTime.now());
 
-  String CurrentMonth_DAY = DatePackage.DateFormat('EEEE').format(DateTime.now());
+  static String CurrentMonth_DAY = DatePackage.DateFormat('EEEE').format(DateTime.now());
   int current_hour = DateTime.now().hour;
   int current_minuites = DateTime.now().minute;
   int current_month = DateTime.now().month;
@@ -116,22 +117,30 @@ class _timeScreenState extends State<timeScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          ElevatedButton(onPressed:(){
-                            checkIn;
+                          ElevatedButton(onPressed:()async{
 
+                            // Obtain shared preferences.
+                            final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-
-                            // Navigator.push(
-                            //   context,
-                            //   MaterialPageRoute(
-                            //       builder: (context) => SignIn(data: checkIn)),
-                            // );
-                            
+                            // Save an String value to 'action' key.
+                            await prefs.setString('checkinaction', '$checkIn');
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => SignIn()));
                           }, style: ElevatedButton.styleFrom(primary: Colors.black, onPrimary: Colors.black , alignment: Alignment.centerLeft),child:Text("$checkIn",style:TextStyle(color:Colors.white , fontSize: 20, fontWeight: FontWeight.w700)) ,  ),
                           SizedBox(width:80),
-                          ElevatedButton(onPressed:(){
-                            checkout;
+
+
+                          ElevatedButton(onPressed:()async{
+                            final SharedPreferences prefs = await SharedPreferences.getInstance();
+                            await prefs.setString('checkinaction', '$checkout');
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const SignIn()),
+                            );
+
+
                           }, style: ElevatedButton.styleFrom(primary: Colors.black, onPrimary: Colors.black , alignment: Alignment.centerRight) ,child:Text("$checkout",style:TextStyle(color:Colors.white , fontSize: 20 , fontWeight: FontWeight.w700)) ),
+
+
                         ],
                       ),
                     )
@@ -142,7 +151,9 @@ class _timeScreenState extends State<timeScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        ElevatedButton(onPressed: (){
+                        ElevatedButton(onPressed: ()async{
+
+
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => const MenuItems()),

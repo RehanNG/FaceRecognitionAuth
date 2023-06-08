@@ -216,6 +216,8 @@ class CameraService extends GetxService {
     this._cameraController = null;
     super.onClose();
   }
+
+
 }
 
 
