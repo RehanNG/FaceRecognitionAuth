@@ -28,7 +28,7 @@ class MLService {
         delegate = GpuDelegateV2(
           options: GpuDelegateOptionsV2 (
             isPrecisionLossAllowed: false,
-            inferencePreference: TfLiteGpuInferenceUsage.fastSingleAnswer,
+            inferencePreference: TfLiteGpuInferenceUsage.preferenceSustainSpeed,
             inferencePriority1: TfLiteGpuInferencePriority.minMemoryUsage,
             inferencePriority2: TfLiteGpuInferencePriority.auto,
             inferencePriority3: TfLiteGpuInferencePriority.auto,
@@ -132,8 +132,9 @@ class MLService {
   //users searching in model stored
   Future<User?> _searchResult(List predictedData) async {
     //for eucledian and cosine distance algorithm I used this
-    DatabaseHelper _dbHelper = DatabaseHelper.instance;
-    List<User> users = await _dbHelper.queryAllUsers();
+    // DatabaseHelper _dbHelper = DatabaseHelper.instance;
+    // List<User> users = await _dbHelper. queryAllUsers();
+    List<User> users = await DatabaseHelper.queryAllUsers();
     // double minDist = 999;
     double minDist = double.infinity;
     double currDist = 0.0;

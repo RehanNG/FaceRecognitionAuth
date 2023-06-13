@@ -29,7 +29,7 @@ class SignUpState extends State<SignUp> with WidgetsBindingObserver{
   Face? faceDetected;
   Size? imageSize;
 
-  static Future<Database>? _database;
+  static Future<Database>? database;
   bool _detectingFaces = false;
   bool pictureTaken = false;
 
@@ -50,8 +50,9 @@ class SignUpState extends State<SignUp> with WidgetsBindingObserver{
     WidgetsBinding.instance.addObserver(this );
     super.initState();
     _start();
-    _database=initializeDatabase();
+    database=initializeDatabase();
   }
+
 static Future<void> createRegisteredTable(Database db , int version) async{
     await db.execute('''
     CREATE TABLE registered (
@@ -77,13 +78,33 @@ static Future<Database> initializeDatabase() async{
 }
 
 static Future<void> insertRegistered(String username, String userId, String image) async{
-    final db = await _database;
+    final db = await database;
     await db!.insert('registered', {
       'username':username,
       'userId':userId,
       'image':image,
     });
 }
+
+//Read
+ static Future<bool> getUsers(String user, String date) async {
+    final db = await database;
+
+    var res = await db!.rawQuery("SELECT * FROM registered WHERE user = ? AND date = ?", [user, date]);
+    //query to get all students into a Map list
+    // final List<Map<String, dynamic>> userMaps = await curDB!.query('registered');
+    //converting the map list to student list
+    //  List.generate(userMaps.length, (i) {
+    //     userMaps[i]['username'];
+    //     userMaps[i]['userId'];
+    //
+    // });
+   return res.isNotEmpty;
+  }
+
+
+
+
 
 
 

@@ -18,7 +18,7 @@ class FaceDetectorService {
   void initialize() {
     _faceDetector = GoogleMlKit.vision.faceDetector(
       FaceDetectorOptions(
-        performanceMode: FaceDetectorMode.fast,
+        performanceMode: FaceDetectorMode.accurate,
         // enableContours: true,
         //    enableLandmarks: true,
           // minFaceSize:1.0,
@@ -128,7 +128,7 @@ class FaceDetectorService {
     final faceDetector = GoogleMlKit.vision.faceDetector(
       FaceDetectorOptions(
         // performanceMode: FaceDetectorMode.accurate,
-        performanceMode: FaceDetectorMode.fast,
+        performanceMode: FaceDetectorMode.accurate,
         enableLandmarks: true,
         minFaceSize:0.8,
           // enableClassification:true,

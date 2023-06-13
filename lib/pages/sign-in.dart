@@ -25,10 +25,13 @@ import 'package:path/path.dart' as Path;
 
 import '../services/c_conversion.dart';
 import '../services/timedelay_service.dart';
+import 'sign-up.dart';
+import 'sucess_login_screen.dart';
 import 'time_screen.dart';
 import 'dart:async';
 
 import 'time_screen.dart';
+import 'package:audioplayers/audioplayers.dart';
 class SignIn extends  StatefulWidget {
   const SignIn({Key? key}) : super(key: key);
 
@@ -48,14 +51,14 @@ class SignInState extends State<SignIn> {
   bool present_status = false;
 
   var date = DateTime.now();
-  Future<Database>? _database;
+  static Future<Database>? database;
   final ConversionService _conversionService = ConversionService();
   @override
   void initState() {
     super.initState();
     _start();
 
-    _database=initializeDatabase();
+    database=initializeDatabase();
     _conversionService.initialize();
 
   }
@@ -162,14 +165,13 @@ if(!locked){
     var getUser;
     var getId;
     assert(image != null, 'Image is null');
-    await _faceDetectorService.detectFacesFromImage(image!);
+    // await _faceDetectorService.detectFacesFromImage(image!);
+     _faceDetectorService.detectFacesFromImage(image!);
     //ager face detect ho gya to kia kam kro
     if (_faceDetectorService.faceDetected) {
       try {
         //null exception error a reha ha , , user jab present nai ha to values null hain , users jab detect ho ga tabhe value aye ge
         //Null check operator used on a null value
-
-
         _mlService.setCurrentPrediction(image, _faceDetectorService.faces[0]);
         //  start from here
         //  capture face
@@ -198,29 +200,60 @@ if(!locked){
 
           String? Checkin_gettingSharePrefs=prefs.getString("checkinaction");
         String currentMonthDay =  timeScreenState.CurrentMonth_DAY;
+
+        bool isUserPresent = await isUserPresentForDate(getUser, formattedDate);
+        if(isUserPresent){
+          Fluttertoast.showToast(
+            msg: "User has already punched in for today",
+            backgroundColor: Colors.red,
+            gravity: ToastGravity.CENTER,
+            toastLength:Toast.LENGTH_SHORT,
+          );
+        }
+        else{
           insertRegistered(
-            getUser, getId, imagetoSend, pre_stat_conv, date.toString() ,"$currentMonthDay","$Checkin_gettingSharePrefs");
-        //show toast
-        Fluttertoast.showToast(
-            msg: " user: $getUser --- Id: $getId --- present : $present_status ",
+              getUser, getId, imagetoSend, pre_stat_conv, date.toString() ,"$currentMonthDay","$Checkin_gettingSharePrefs");
+
+          // final player = AudioPlayer();
+          // await player..setSource(AssetSource('assets/bell.mp3'));
+
+
+          final player=AudioPlayer();
+          player.play(AssetSource('bell.mp3'));
+
+
+          //show toast
+          // Fluttertoast.showToast(
+          //   msg: " Sucess ",
+          //   backgroundColor: Colors.green,
+          //   gravity: ToastGravity.CENTER,
+          //   toastLength:Toast.LENGTH_SHORT,
+          // );
+
+
+          var hourconv = timeScreenState.current_hour.toString();
+          var minconv = timeScreenState.current_minuites.toString();
+
+
+          // SucessScreen
+          delayTimerForPageNavigation(0, context, SucessScreen());
+          // _faceDetectorService.initialize();
+          //
+
+          Fluttertoast.showToast(
+            msg: " user: $getUser --- Id: $getId --- time : $hourconv : $minconv ",
             backgroundColor: Colors.green,
             gravity: ToastGravity.CENTER,
-        toastLength:Toast.LENGTH_SHORT,
-        ) ;
-        _faceDetectorService.initialize();
-        //
+            toastLength:Toast.LENGTH_SHORT,
+          );
+        }
 
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => timeScreen()),
-
-        );
 
 
         }
-        else if( user != null &&  (date.minute==date.minute) ){
+        else{
           Fluttertoast.showToast(
-            msg: " duplicate punch ",
+            msg: " user not detected ",
             backgroundColor: Colors.red,
             gravity: ToastGravity.CENTER,
             toastLength:Toast.LENGTH_SHORT,
@@ -240,7 +273,21 @@ if(!locked){
 
     }
     else {
-      _faceDetectorService.initialize();
+
+      // _faceDetectorService.initialize();
+      setState(() {
+        insertRegistered(
+            "user not detected", "user not detected", "user not detected", "user not detected", date.toString() ,"user not detected","user not detected");
+        image=null;
+        User user = new User(user:"", password: "", modelData:List.empty());
+        user.user="";
+        user.password="";
+        locked=false;
+        present_status = false;
+
+        _isPictureTaken= false;
+        return;
+      });
       print("present in else");
     }
     if (!mounted) {
@@ -256,6 +303,14 @@ if(!locked){
   }
 
   }
+
+
+  Future<bool> isUserPresentForDate(String user, String time) async {
+    final db = await SignInState.database;
+    var res = await db!.rawQuery("SELECT * FROM userattendance WHERE username = ? AND attendancetime = ?", [user, time]);
+    return res.isNotEmpty;
+  }
+
 
   String convertCameraImageToBase64(CameraImage image) {
     // Convert the image to a Uint8List
@@ -298,7 +353,7 @@ if(!locked){
       // attendanceType TEXT,
   Future<void> insertRegistered(String username , String userId,String image , String presentstat , String attendancetime  , String day , String attendanceType)
   async{
-    final db= await _database;
+    final db= await database;
 
     await db!.insert('userattendance', {
 

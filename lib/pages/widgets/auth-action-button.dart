@@ -46,6 +46,7 @@ class _AuthActionButtonState extends State<AuthActionButton> {
   User? predictedUser;
 
   Future _signUp(context) async {
+    //here we will define our logic
     DatabaseHelper _databaseHelper = DatabaseHelper.instance;
     List predictedData = _mlService.predictedData;
     String user = _userTextEditingController.text;
@@ -177,7 +178,9 @@ class _AuthActionButtonState extends State<AuthActionButton> {
               : Container(),
           Container(
             child: Column(
+
               children: [
+
                 !widget.isLogin
                     ? AppTextField(
                   controller: _userTextEditingController,

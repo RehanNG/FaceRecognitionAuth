@@ -55,8 +55,8 @@ class timeScreenState extends State<timeScreen> {
   // String formattedDate = DateFormat.yMMMEd().format(DateTime.now());
 
   static String CurrentMonth_DAY = DatePackage.DateFormat('EEEE').format(DateTime.now());
-  int current_hour = DateTime.now().hour;
-  int current_minuites = DateTime.now().minute;
+  static int current_hour = DateTime.now().hour;
+  static int current_minuites = DateTime.now().minute;
   int current_month = DateTime.now().month;
   int current_year = DateTime.now().year;
   int current_day = DateTime.now().day;

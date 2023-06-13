@@ -46,8 +46,8 @@ class DatabaseHelper {
     Database db = await instance.database;
     return await db.insert(table, user.toMap());
   }
-
-  Future<List<User>> queryAllUsers() async {
+ //Reading Data or Getting Data From DataBase
+ static Future<List<User>> queryAllUsers() async {
     Database db = await instance.database;
     List<Map<String, dynamic>> users = await db.query(table);
     return users.map((u) => User.fromMap(u)).toList();
