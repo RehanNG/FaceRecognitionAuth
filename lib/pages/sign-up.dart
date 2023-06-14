@@ -113,7 +113,6 @@ static Future<void> insertRegistered(String username, String userId, String imag
   void dispose() {
     super.dispose();
     // cameraService.dispose();
-
   }
  @override
  void didChangeAppLifecycleState(AppLifecycleState state) {

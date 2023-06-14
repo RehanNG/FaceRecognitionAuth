@@ -29,8 +29,8 @@ class MLService {
           options: GpuDelegateOptionsV2 (
             isPrecisionLossAllowed: false,
             inferencePreference: TfLiteGpuInferenceUsage.preferenceSustainSpeed,
-            inferencePriority1: TfLiteGpuInferencePriority.minMemoryUsage,
-            inferencePriority2: TfLiteGpuInferencePriority.auto,
+            inferencePriority1: TfLiteGpuInferencePriority.minLatency,
+            inferencePriority2: TfLiteGpuInferencePriority.maxPrecision,
             inferencePriority3: TfLiteGpuInferencePriority.auto,
           ),
         );

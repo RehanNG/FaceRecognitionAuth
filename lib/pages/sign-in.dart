@@ -103,13 +103,7 @@ class SignInState extends State<SignIn> {
                 faceDetected!.headEulerAngleY! > 10 || faceDetected!.headEulerAngleY! < -10;
             if (!eulerAngleY) {
               await _predictFacesFromImage(image: image);
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => timeScreen()),
-              );
               // delayTimerForPageNavigation(4 ,context,SignIn());
-
-
             }
           }
           else {
@@ -142,6 +136,11 @@ class SignInState extends State<SignIn> {
 
 
           }
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => timeScreen()),
+          );
 
         } finally {
           _detectingFaces = false;

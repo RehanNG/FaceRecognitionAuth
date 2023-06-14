@@ -1,9 +1,8 @@
 //getting all users from database
 import 'package:face_net_authentication/pages/models/user.model.dart';
 import 'package:flutter/material.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:flutter_custom_cards/flutter_custom_cards.dart';
 import 'db/databse_helper.dart';
-import 'sign-up.dart';
 class GettingAllUsersFromDataBase extends StatefulWidget {
   const GettingAllUsersFromDataBase({Key? key}) : super(key: key);
 
@@ -12,63 +11,66 @@ class GettingAllUsersFromDataBase extends StatefulWidget {
 }
 
 class _GettingAllUsersFromDataBaseState extends State<GettingAllUsersFromDataBase> {
-   var myUser;
-   var allUsers ;
+
+   @override
+   void initState() {
+     super.initState();
+     _loadUsers();
+   }
+
+   List<User> _users = [];
+   Future<void> _loadUsers() async {
+     List<User> users = await DatabaseHelper.queryAllUsers();
+     setState(() {
+       _users = users;
+     });
+   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body:ListView(
-        children: <Widget>[
+      appBar: AppBar(
+        title: Text("Users List"),
+        backgroundColor: Colors.indigo,
+      ),
+      body:ListView.builder(
+        itemCount: _users.length,
+        itemBuilder: (BuildContext context , int index){
+          User user = _users[index];
+
+          return Padding(
+            padding: const EdgeInsets.all(17),
+            child: CustomCard(
+              height: 60,
+             borderRadius: 10,
+             color: Colors.indigoAccent,
+             hoverColor: Colors.indigo,
 
 
-          TextButton(onPressed: ()async{
+             onTap: (){},
+             child: Column(
+               crossAxisAlignment: CrossAxisAlignment.center,
+               mainAxisAlignment: MainAxisAlignment.center,
+               children: [
+                 Text('User: ${user.user}',style: TextStyle(color: Colors.white),),
+                 Text('ID: ${user.password}',style: TextStyle(color: Colors.white)),
+               ],
+             ),
+            ),
+          );
 
-            List<User> users = await DatabaseHelper.queryAllUsers();
-            for (User u in users) {
-              print(u.user);
-              print(u.password);
-            }
+        }
 
 
-          }, child: Text("get users"))
-
-
-        ],
       ),
     );
   }
 
 
 
-//   Future<List<Map<String, dynamic>>> fetchDataFromDatabase() async {
-//     // Open the database
-//     final Database db = await openDatabase('my_database.db');
-//
-//     // Query the database for all rows in the 'users' table
-//     final List<Map<String, dynamic>> users = await db.rawQuery('SELECT * FROM registered');
-//
-//     // Close the database
-//     await db.close();
-// myUser=users;
-//     // Return the list of users
-//     return myUser;
-//   }
 
 
 
-   _query() async {
-     final Database db = await openDatabase("MyDatabase.db");
-     // get a reference to the database
-
-     // get all rows
-     List<Map> result = await db.query(DatabaseHelper.table);
-
-     // print the results
-     result.forEach((row) => print(row));
-     // {_id: 1, name: Bob, age: 23}
-     // {_id: 2, name: Mary, age: 32}
-     // {_id: 3, name: Susan, age: 12}
-   }
 
 
 
